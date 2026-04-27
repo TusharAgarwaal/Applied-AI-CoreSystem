@@ -359,3 +359,9 @@ streamlit
 ```
 
 No API keys. No external services. Runs entirely offline.
+
+---
+
+## Model Card
+
+See [model_card.md](model_card.md) for intended use, data, strengths, limitations, and evaluation.
