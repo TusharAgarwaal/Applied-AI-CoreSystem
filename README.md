@@ -1,5 +1,9 @@
 # BeatHive — Conversational Music Recommender
 
+##Video Explanation
+If the readme seems not for you, then this video will:
+https://www.loom.com/share/cae339bb8fad48d4adf12ecc32837bc5
+
 > Tell me your vibe. I'll find your track.
 
 BeatHive is a command-line music recommender that interviews you in natural language, builds a taste profile from your answers, scores every song in its catalog against that profile using a weighted formula, and returns your top 5 picks with a breakdown of exactly why each song made the cut.
