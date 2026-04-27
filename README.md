@@ -6,7 +6,7 @@ BeatHive is a command-line music recommender that interviews you in natural lang
 
 ---
 
-## Original Project (Modules 1–3)
+## Original Project
 
 This project began as the **Music Recommender Simulation** from Modules 1–3, where the goal was to model how streaming platforms turn user taste data into ranked recommendations. The original system represented songs as structured data (genre, mood, energy, BPM, valence, acousticness, danceability) and implemented a weighted scoring formula — called the **Algorithm Recipe** — that assigned points to each feature based on how closely a song matched a static user profile. The focus was on understanding the mechanics of collaborative and content-based filtering in a small, transparent system before scaling to real-world complexity.
 
@@ -50,6 +50,8 @@ Two entry points:
 |---|---|
 | `python -m src.agent` | Conversational — asks you questions, then recommends |
 | `python -m src.main`  | Simulation — pick from preset profiles, then recommends |
+
+![UML Diagram](<Song Recommender UML.png>)
 
 ---
 
