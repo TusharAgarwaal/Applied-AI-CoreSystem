@@ -1,6 +1,8 @@
 # BeatHive — Conversational Music Recommender
 
-##Video Explanation
+
+## Video Explanation
+
 If the readme seems not for you, then this video will:
 https://www.loom.com/share/cae339bb8fad48d4adf12ecc32837bc5
 
