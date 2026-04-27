@@ -91,7 +91,6 @@ EDGE_CASE_PROFILES = [
 ]
 
 
-
 def _print_recommendations(profile: dict, recommendations: list) -> None:
     print("\n" + "=" * 40)
     print(f"  Profile: {profile['name']}")
@@ -107,19 +106,27 @@ def _print_recommendations(profile: dict, recommendations: list) -> None:
 
 def main() -> None:
     songs = load_songs("data/songs.csv")
+    all_profiles = USER_PROFILES + EDGE_CASE_PROFILES
 
     print(f"\nPowered by {MODEL_NAME}")
-    print("\n*** Standard Profiles ***")
-    for profile in USER_PROFILES:
-        recommendations = recommend_songs(profile, songs, k=5)
-        _print_recommendations(profile, recommendations)
+    print("\nAvailable Profiles:")
+    for i, profile in enumerate(all_profiles, start=1):
+        print(f"  {i}. {profile['name']}")
 
-    print("\n*** Edge Case Profiles ***")
-    for profile in EDGE_CASE_PROFILES:
-        # k=20 on No Match Profile tests behavior when k exceeds catalog size
-        k = 20 if profile["name"] == "No Match Profile" else 5
-        recommendations = recommend_songs(profile, songs, k=k)
-        _print_recommendations(profile, recommendations)
+    while True:
+        try:
+            choice = input("\nSelect a profile (enter number): ").strip()
+            index = int(choice) - 1
+            if 0 <= index < len(all_profiles):
+                break
+            print(f"Please enter a number between 1 and {len(all_profiles)}.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+
+    selected = all_profiles[index]
+    k = 20 if selected["name"] == "No Match Profile" else 5
+    recommendations = recommend_songs(selected, songs, k=k)
+    _print_recommendations(selected, recommendations)
 
 
 if __name__ == "__main__":

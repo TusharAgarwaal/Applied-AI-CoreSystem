@@ -1,11 +1,21 @@
 id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness
-1,Sunrise City,Neon Echo,pop,happy,0.82,118,0.84,0.79,0.18
-2,Midnight Coding,LoRoom,lofi,chill,0.42,78,0.56,0.62,0.71
-3,Storm Runner,Voltline,rock,intense,0.91,152,0.48,0.66,0.10
-4,Library Rain,Paper Lanterns,lofi,chill,0.35,72,0.60,0.58,0.86
-5,Gym Hero,Max Pulse,pop,intense,0.93,132,0.77,0.88,0.05
-6,Spacewalk Thoughts,Orbit Bloom,ambient,chill,0.28,60,0.65,0.41,0.92
-7,Coffee Shop Stories,Slow Stereo,jazz,relaxed,0.37,90,0.71,0.54,0.89
-8,Night Drive Loop,Neon Echo,synthwave,moody,0.75,110,0.49,0.73,0.22
-9,Focus Flow,LoRoom,lofi,focused,0.40,80,0.59,0.60,0.78
-10,Rooftop Lights,Indigo Parade,indie pop,happy,0.76,124,0.81,0.82,0.35
+1,Levitating,Dua Lipa,pop,happy,0.82,103,0.91,0.70,0.07
+2,Happy,Pharrell Williams,pop,happy,0.84,160,0.96,0.73,0.07
+3,Roar,Katy Perry,pop,intense,0.84,92,0.85,0.63,0.03
+4,Blinding Lights,The Weeknd,pop,intense,0.80,128,0.33,0.51,0.01
+5,Feather,Nujabes,lofi,chill,0.38,85,0.62,0.58,0.72
+6,Snowfall,Øneheart,lofi,chill,0.32,75,0.48,0.52,0.80
+7,Coffee,beabadoobee,lofi,focused,0.41,80,0.64,0.55,0.75
+8,Thunderstruck,AC/DC,rock,intense,0.95,133,0.57,0.47,0.01
+9,Enter Sandman,Metallica,rock,intense,0.93,123,0.28,0.52,0.01
+10,Sweet Child O' Mine,Guns N' Roses,rock,happy,0.78,125,0.66,0.52,0.03
+11,Weightless,Marconi Union,ambient,chill,0.19,60,0.24,0.22,0.95
+12,Experience,Ludovico Einaudi,ambient,focused,0.28,72,0.45,0.30,0.92
+13,Fly Me to the Moon,Frank Sinatra,jazz,relaxed,0.35,120,0.83,0.55,0.88
+14,Take Five,Dave Brubeck Quartet,jazz,relaxed,0.25,88,0.52,0.40,0.87
+15,What a Wonderful World,Louis Armstrong,jazz,happy,0.25,68,0.72,0.44,0.92
+16,Midnight City,M83,synthwave,moody,0.77,106,0.46,0.61,0.05
+17,Nightcall,Kavinsky,synthwave,moody,0.72,102,0.15,0.60,0.01
+18,Budapest,George Ezra,indie pop,happy,0.63,129,0.77,0.67,0.22
+19,Ho Hey,The Lumineers,indie pop,happy,0.70,138,0.88,0.64,0.63
+20,Stolen Dance,Milky Chance,indie pop,chill,0.53,108,0.75,0.68,0.35

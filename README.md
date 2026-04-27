@@ -1,297 +1,359 @@
-# 🎵 Music Recommender Simulation
+# BeatHive — Conversational Music Recommender
 
-## Project Summary
+> Tell me your vibe. I'll find your track.
 
-In this project you will build and explain a small music recommender system.
-
-Your goal is to:
-
-- Represent songs and a user "taste profile" as data
-- Design a scoring rule that turns that data into recommendations
-- Evaluate what your system gets right and wrong
-- Reflect on how this mirrors real world AI recommenders
-
-Replace this paragraph with your own summary of what your version does.
+BeatHive is a command-line music recommender that interviews you in natural language, builds a taste profile from your answers, scores every song in its catalog against that profile using a weighted formula, and returns your top 5 picks with a breakdown of exactly why each song made the cut.
 
 ---
 
-## How The System Works
+## Original Project (Modules 1–3)
 
-Explain your design in plain language.
-
-Some prompts to answer:
-
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
-
-You can include a simple diagram or bullet list if helpful.
-
---- Below is the simple flow chart of how the program is processing:
-Input (User Prefs) → Process (Recommender: Using the Algorithm recipe) → Output (The Ranking of Songs: Top K Recommendations).
-
-The Algorithm Recipe is that it first calculates the score based on the intensity & genre which computes energy. But since this will only recommend songs based on score computed, it may not consider user's taste. Hence bpm is also taken in consideration to have better results which aligns with the user's taste as well.
-
-genre, mood, energy, tempo_bpm, valence, acousticness and danceability are the features in the song but only energy & tempo_bpm are combined in the score.
-
-UserProfile takes favorite_genre, favorite_mood, target_energy, target_bpm, and likes_acoustic, accounting for both taste and score.
-
-Recommender compute the score based on the intensity score (energy and tempo) and genre/mood, which generates a weighted sum that ranks the songs.
-
+This project began as the **Music Recommender Simulation** from Modules 1–3, where the goal was to model how streaming platforms turn user taste data into ranked recommendations. The original system represented songs as structured data (genre, mood, energy, BPM, valence, acousticness, danceability) and implemented a weighted scoring formula — called the **Algorithm Recipe** — that assigned points to each feature based on how closely a song matched a static user profile. The focus was on understanding the mechanics of collaborative and content-based filtering in a small, transparent system before scaling to real-world complexity.
 
 ---
 
-## Getting Started
+## Why It Matters
 
-### Setup
+Real recommenders are black boxes. BeatHive is not. Every score is explainable: you can see exactly how many points a song earned for genre, mood, intensity, acousticness, and valence — and why. The conversational front-end makes the system accessible to anyone, while the transparent scoring makes it educational for anyone learning how AI recommendations work under the hood.
 
-1. Create a virtual environment (optional but recommended):
+---
 
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate      # Mac or Linux
-   .venv\Scripts\activate         # Windows
+## System Architecture
 
-2. Install dependencies
+```
+User
+ │
+ ▼
+[ agent.py ] — asks 5 questions one at a time
+ │               genre → mood → energy → tempo → acoustic preference
+ │
+ ▼
+[ UserProfile dict ] — structured taste profile built from answers
+ │
+ ▼
+[ recommender.py ] — scores every song in the catalog
+ │   for each song:
+ │     genre match      → +3.0 pts
+ │     mood match       → +2.0 pts
+ │     intensity delta  → up to +3.0 pts  (energy + BPM combined)
+ │     acousticness fit → up to +1.0 pts
+ │     valence fit      → up to +1.0 pts
+ │                         ──────────────
+ │                         max score: 10.0
+ │
+ ▼
+[ Ranked Top-K Songs ] — printed with score and per-feature breakdown
+```
+
+Two entry points:
+| Command | Mode |
+|---|---|
+| `python -m src.agent` | Conversational — asks you questions, then recommends |
+| `python -m src.main`  | Simulation — pick from preset profiles, then recommends |
+
+---
+
+## Setup
+
+**Requirements:** Python 3.8+ and either `uv` or `pip`.
 
 ```bash
+# 1. Clone the repo
+git clone <your-repo-url>
+cd assets
+
+# 2a. Install with uv (recommended)
+uv pip install -r requirements.txt
+
+# 2b. Or install with pip
 pip install -r requirements.txt
+
+# 3. Run the conversational agent
+uv run python -m src.agent
+
+# 4. Or run the simulation mode
+uv run python -m src.main
 ```
 
-3. Run the app:
-
-```bash
-python -m src.main
-```
-![alt text](image.png)
-![alt text](image-1.png)
-
-### Running Tests
-
-Run the starter tests with:
-
-```bash
-pytest
-```
-
-You can add more tests in `tests/test_recommender.py`.
+> All commands must be run from the `assets/` directory so that `data/songs.csv` resolves correctly.
 
 ---
 
-## Experiments You Tried
+## Sample Interactions
 
-Use this section to document the experiments you ran. For example:
+### Example 1 — Rock Fan
 
-- What happened when you changed the weight on genre from 2.0 to 0.5.
---- Rankings changed:
+```
+BeatHive Music Assistant  (powered by BeatHive 1.0)
+────────────────────────────────────────
+Answer a few questions and I'll find your perfect tracks.
 
-High-Energy Pop — Rooftop Lights jumped to #2, pushing Gym Hero to #3. Before, Gym Hero had genre match to carry it. Now intensity closeness matters more, and Rooftop Lights is closer in intensity to the user target.
-Chill Lofi — Spacewalk Thoughts (ambient, not lofi) jumped to #3, overtaking Focus Flow (lofi). Genre now worth less, so intensity proximity carries it higher.
-Scores exceeded 10 (e.g. 11.20) — expected since max is now 11.5 with the shifted weights.
+What genre are you in the mood for?
+  1. pop   2. lofi   3. rock   4. ambient   5. jazz   6. synthwave   7. indie pop
+Your choice: 3
 
-Rankings stayed the same:
+What's your current mood?
+  1. happy   2. chill   3. intense   4. relaxed   5. focused   6. moody
+Your choice: 3
 
-#1 picks (Sunrise City, Library Rain, Storm Runner) didn't change — they had both strong genre/mood AND strong intensity, so doubling intensity still keeps them on top.
-This confirms the model is sensitive to weight changes but not fragile — top picks hold when they're genuinely strong across multiple features.
+How energetic should the music feel?
+  1. Low  — quiet and calm
+  2. Medium — balanced energy
+  3. High  — pumped and intense
+Your choice: 3
 
+What tempo do you prefer?
+  1. Slow   (60–80 BPM)
+  2. Medium (80–110 BPM)
+  3. Fast   (110–160 BPM)
+Your choice: 3
 
-- What happened when you added tempo or valence to the score
---- Rankings are stable at the top and bottom (within bottom 3) except for the middle rankings. But scores exceeded 10 (max is now 12 with tempo+valence additions).
+Do you prefer acoustic / organic sounds over electronic?
+  1. Yes
+  2. No
+Your choice: 2
 
-What shifted:
-Gym Hero stays #2 for High-Energy Pop but scores jump from 7.65 → 9.62 — its high valence (0.93) and close tempo (132 bpm vs target 128) now contribute more.
-Rooftop Lights stays #3 but gap to Gym Hero widened — it's an indie pop song with bpm 124, close enough in tempo to score well.
-Songs with valence near 0.7 benefit most from the valence bump.
+Finding your tracks...
 
-This shows that the model is sensitive in the middle ranks when I applied the score change.
+==================================================
+  Your BeatHive Picks
+  Rock / intense / energy 85%
+==================================================
 
-- How did your system behave for different types of users
---- I added different types of users to the model and below are the observations:
-The Gym Goer — max score only 6.63. No genre match drags the ceiling down significantly. Mood (intense) is the only categorical hit, so intensity carries the ranking. Gym Hero and Storm Runner trade #1/#2 closely (6.63 vs 6.59).
+  #1  Thunderstruck  —  AC/DC
+       Score : 9.73 / 10
+       Why   :
+               • genre match (+3.0)
+               • mood match (+2.0)
+               • intensity (0.89) match (+2.87)
+               • acousticness match (+0.99)
+               • valence match (+0.87)
 
-The Late Night Studier — strongest result at 9.57. Genre (lofi) + mood (focused) + close intensity all align on Focus Flow. The model works best when all signals point the same direction.
+  #2  Enter Sandman  —  Metallica
+       Score : 9.56 / 10
+       Why   :
+               • genre match (+3.0)
+               • mood match (+2.0)
+               • intensity (0.85) match (+2.99)
+               • acousticness match (+0.99)
+               • valence match (+0.58)
 
-The Mood Listener — genre set to unknown so no genre points ever awarded. Sunrise City and Rooftop Lights top purely on mood match + intensity proximity. Max score 6.03 — confirms genre is worth +3.0 and its absence is felt.
-
-The Genre Purist — only Coffee Shop Stories matches jazz in the whole catalog, so it scores 6.81 and #2 drops sharply to 4.10. Confirms genre match is a strong but sparse signal.
-
-The Neutral User — no categorical matches at all, scores bunched tightly between 3.32–4.10. The model still differentiates but with low confidence — intensity + acousticness are the only separators.
-
-When the Genre doesn't match, the max score drops to ~6.6, which results in tighter rankings and less decisive.
+  #3  Sweet Child O' Mine  —  Guns N' Roses
+       Score : 7.82 / 10
+       Why   :
+               • genre match (+3.0)
+               • intensity (0.86) match (+2.96)
+               • acousticness match (+0.97)
+               • valence match (+0.89)
+==================================================
+```
 
 ---
 
-## Limitations and Risks
+### Example 2 — Late-Night Lofi Session
 
-Summarize some limitations of your recommender.
+```
+What genre are you in the mood for?
+Your choice: 2   (lofi)
 
-Examples:
+What's your current mood?
+Your choice: 2   (chill)
 
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
+How energetic should the music feel?
+Your choice: 1   (Low — quiet and calm)
 
-You will go deeper on this in your model card.
+What tempo do you prefer?
+Your choice: 1   (Slow, 60–80 BPM)
 
-The major limitation of the recommender is that it shows a bit inaccuracy since there are no mid-range intensity level songs in the pre-exisiting catalogue.
+Do you prefer acoustic / organic sounds over electronic?
+Your choice: 1   (Yes)
+
+Finding your tracks...
+
+==================================================
+  Your BeatHive Picks
+  Lofi / chill / energy 25%
+==================================================
+
+  #1  Snowfall  —  Øneheart
+       Score : 9.43 / 10
+       Why   :
+               • genre match (+3.0)
+               • mood match (+2.0)
+               • intensity (0.39) match (+2.85)
+               • acousticness match (+0.80)
+               • valence match (+0.78)
+
+  #2  Feather  —  Nujabes
+       Score : 9.30 / 10
+       Why   :
+               • genre match (+3.0)
+               • mood match (+2.0)
+               • intensity (0.46) match (+2.66)
+               • acousticness match (+0.72)
+               • valence match (+0.92)
+
+  #3  Coffee  —  beabadoobee
+       Score : 8.93 / 10
+       Why   :
+               • genre match (+3.0)
+               • intensity (0.44) match (+2.70)
+               • acousticness match (+0.75)
+               • valence match (+0.94)
+==================================================
+```
+
+---
+
+### Example 3 — Jazz Evening (No Exact Genre Match in Profiles)
+
+```
+What genre are you in the mood for?
+Your choice: 5   (jazz)
+
+What's your current mood?
+Your choice: 4   (relaxed)
+
+How energetic should the music feel?
+Your choice: 1   (Low — quiet and calm)
+
+What tempo do you prefer?
+Your choice: 2   (Medium, 80–110 BPM)
+
+Do you prefer acoustic / organic sounds over electronic?
+Your choice: 1   (Yes)
+
+Finding your tracks...
+
+==================================================
+  Your BeatHive Picks
+  Jazz / relaxed / energy 25%
+==================================================
+
+  #1  Take Five  —  Dave Brubeck Quartet
+       Score : 9.19 / 10
+       Why   :
+               • genre match (+3.0)
+               • mood match (+2.0)
+               • intensity (0.40) match (+2.83)
+               • acousticness match (+0.87)
+               • valence match (+0.82)
+
+  #2  Fly Me to the Moon  —  Frank Sinatra
+       Score : 8.97 / 10
+       Why   :
+               • genre match (+3.0)
+               • mood match (+2.0)
+               • intensity (0.55) match (+2.34)
+               • acousticness match (+0.88)
+               • valence match (+0.75)
+
+  #3  Weightless  —  Marconi Union
+       Score : 6.54 / 10
+       Why   :
+               • intensity (0.31) match (+2.94)
+               • acousticness match (+0.95)
+               • valence match (+0.54)
+==================================================
+```
+
+---
+
+## Design Decisions
+
+### Why a weighted scoring formula instead of ML?
+
+The formula is fully transparent: every point awarded has a named reason. A neural network would likely outperform it on a large catalog, but it would be impossible to explain *why* a song ranked #2 over #3. For an educational tool, explainability outweighs raw accuracy.
+
+### Why a conversational agent for input?
+
+The original simulation used hardcoded profiles. Real users don't think in floats — they think in feelings. The agent maps natural language choices (low / medium / high energy, slow / medium / fast tempo) to numeric values, making the system accessible without changing the scoring logic underneath.
+
+### Trade-offs made
+
+| Decision | Trade-off |
+|---|---|
+| Rule-based scoring | Transparent but limited — can't learn from feedback |
+| Categorical genre/mood matching | Simple but brittle — "indie pop" and "pop" score as completely different |
+| BPM mapped to 3 buckets | Easy for users but loses precision |
+| 20-song catalog | Enough to test ranking behavior, too small for real use |
+
+### Why intensity carries the most weight (up to 6 of 10 points)?
+
+Genre and mood are categorical — a song either matches or it doesn't. Intensity (energy + BPM combined) is continuous, so it can partially match, making it the most nuanced signal and the best differentiator when genre and mood are already tied.
+
+---
+
+## Testing Summary
+
+Tests live in `tests/test_recommender.py`. Run them with:
+
+```bash
+uv run pytest
+```
+
+### What the test suite covers
+
+| Test group | What it checks |
+|---|---|
+| Score bounds | Score never exceeds 10 or drops below 0 |
+| Component scoring | Genre adds exactly +3.0, mood adds exactly +2.0 |
+| Intensity | Perfect match gives +3.0; large mismatch gives < 1.0 |
+| Acousticness | Correctly rewards high acousticness for acoustic users and vice versa |
+| Recommender output | Results sorted descending, k-limit respected, empty catalog returns empty |
+| Explanation quality | Output is a non-empty string containing all 5 component names |
+| Precision@K harness | Fraction of top-k results that match genre or mood |
+
+### What worked
+
+- The scoring formula is logically sound. Every test passed on the first implementation, which confirmed the math was right.
+- Precision@K = 1.0 for clear-match profiles (e.g. pop/happy user on a pop-heavy catalog).
+
+### What didn't work
+
+- **Weight sensitivity**: Changing genre weight from 3.0 to 0.5 caused scores to exceed 10 — the formula assumes fixed maximums and breaks if weights shift.
+- **Mid-range intensity gap**: Songs clustered at the extremes (very low or very high energy) meant medium-intensity users were always slightly penalized regardless of which song ranked first.
+
+### What I learned
+
+Scoring systems are easy to get right logically but hard to get right empirically. A formula that passes unit tests can still produce rankings that feel wrong for edge-case users — which is exactly why evaluation profiles and Precision@K matter.
 
 ---
 
 ## Reflection
 
-Read and complete `model_card.md`:
+Building BeatHive changed how I think about recommendation systems in two ways.
 
-[**Model Card**](model_card.md)
+First, **categorical features do heavy lifting**. Genre and mood together account for up to 5 of 10 points, which mirrors how real platforms work — Spotify's genre clusters and mood playlists are not cosmetic, they are the core signal. When a user's genre isn't in the catalog at all, the entire ranking collapses into a narrow band of intensity scores, which shows how fragile a recommender becomes when its training data doesn't represent a user.
 
-Write 1 to 2 paragraphs here about what you learned:
-
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
-
+Second, **explainability is a design choice, not a freebie**. The reason BeatHive can print "genre match (+3.0)" is because the score was designed to be interpretable from the start. Most production models sacrifice this for accuracy. Understanding that trade-off — and when each side of it matters — is the most transferable lesson from this project.
 
 ---
 
-## 7. `model_card_template.md`
+## Project Structure
 
-Combines reflection and model card framing from the Module 3 guidance. :contentReference[oaicite:2]{index=2}  
-
-```markdown
-# 🎧 Model Card - Music Recommender Simulation
-
-## 1. Model Name
-
-Give your recommender a name, for example:
-
-> VibeFinder 1.0
-
---- BeatHive 1.0
-
----
-
-## 2. Intended Use
-
-- What is this system trying to do
-- Who is it for
-
-Example:
-
-> This model suggests 3 to 5 songs from a small catalog based on a user's preferred genre, mood, and energy level. It is for classroom exploration only, not for real users.
-
---- The model calculates the score from the song catalog based on its 5 components, returning a sorted list of songs defined by user's preference.
-It is for classroom exploration only, not for real users.
----
-
-## 3. How It Works (Short Explanation)
-
-Describe your scoring logic in plain language.
-
-- What features of each song does it consider
-- What information about the user does it use
-- How does it turn those into a number
-
-Try to avoid code in this section, treat it like an explanation to a non programmer.
-
---- It considers 5 features of a song: Genre, Mood, Intensity, Acousticness and Valence. User preference including target energy level and target bpm are taken into consideration, which combine as intensity level & contributes maximum out of all the features to the scoring.
-Certain points are assigned to each feature and they are applied in a logical formula, which then helps in ranking the song.
+```
+assets/
+├── data/
+│   └── songs.csv          # 20-song catalog with audio features
+├── src/
+│   ├── agent.py           # Conversational entry point (agentic workflow)
+│   ├── main.py            # Simulation entry point (preset profiles)
+│   └── recommender.py     # Scoring formula, data loader, Recommender class
+├── tests/
+│   └── test_recommender.py  # pytest suite + Precision@K harness
+├── model_card.md
+└── requirements.txt
+```
 
 ---
 
-## 4. Data
+## Requirements
 
-Describe your dataset.
+```
+pandas
+pytest
+streamlit
+```
 
-- How many songs are in `data/songs.csv`
-- Did you add or remove any songs
-- What kinds of genres or moods are represented
-- Whose taste does this data mostly reflect
-
-![alt text](<Profile Wise Output.png>)
-![alt text](<Profile Wise Output-2.png>)
-![alt text](<Profile Wise Output-3.png>)
-![alt text](<Profile Wise Output-4.png>)
-![alt text](<Profile Wise Output-5.png>)
-![alt text](<Profile Wise Output-6.png>)
-
---- There are 10 songs in the csv file and no songs were added or deleted from the catalog.
-Six types of Genre and 5 types of Mood are taken into consideration by the recommender.
-User's preference includes Genre and Mood whose taste gets reflected.
-
----
-
-## 5. Strengths
-
-Where does your recommender work well
-
-You can think about:
-- Situations where the top results "felt right"
-- Particular user profiles it served well
-- Simplicity or transparency benefits
-
----The user profiles that have clear details on the preference gets better recommendations.
-High-Energy Pop, Chill Lofi, and Deep Intense Rock were some of the user profiles where it worked the best.
-The lofi profiles: Library Rain and Midnight Coding are both low-intensity, acoustic, chill, where the scores reflect that with very little ambiguity.
-
----
-
-## 6. Limitations and Bias
-
-Where does your recommender struggle
-
-Some prompts:
-- Does it ignore some genres or moods
-- Does it treat all users as if they have the same taste shape
-- Is it biased toward high energy or one genre by default
-- How could this be unfair if used in a real product
-
----There are 10 songs in the .csv file, and checking by their intensity values, no one accurately covers the user's preferred intensity.
-The medium-intensity user is systematically penalized 0.4 points on intensity before the scoring even looks at genre or mood.
-For ultra-high intensity users, user can't have 1.0 intensity song as per the current song catalogue, setting the one preference.
-The formula set for calculating score treats overshooting and undershooting equally because of the gap size between intensity of different songs in the current catalogue.
-
----
-
-## 7. Evaluation
-
-How did you check your system
-
-Examples:
-- You tried multiple user profiles and wrote down whether the results matched your expectations
-- You compared your simulation to what a real app like Spotify or YouTube tends to recommend
-- You wrote tests for your scoring logic
-
-You do not need a numeric metric, but if you used one, explain what it measures.
-
---- Firstly, I ran the tests in test_recommender.py which confirm the core logic behind the scoring formula.
-Then several profiles were added which prints scores with breakdowns. The standard three profiles (High-Energy Pop, Chill Lofi, Deep Intense Rock) were used to check the obvious answer which it did.
-The breakdown of the score shown is enough to determine if the profile worked correctly against the scoring logic, making it easy to catch if any logic error exists.
----
-
-## 8. Future Work
-
-If you had more time, how would you improve this recommender
-
-Examples:
-
-- Add support for multiple users and "group vibe" recommendations
-- Balance diversity of songs instead of always picking the closest match
-- Use more features, like tempo ranges or lyric themes
-
---- I would like to take actual user preferences rather than assuming them. Even data like streaming history or common vibe between various users.
-A large library of songs catalog is required to analyze Genre and Mood more closely which could give a balanced diversity of songs.
-Maybe creating a memory for the system could work, giving options like streaming history or song type preference in different hours of the day, contributing to better recommendation.
-
----
-
-## 9. Personal Reflection
-
-A few sentences about what you learned:
-
-- What surprised you about how your system behaved
-- How did building this change how you think about real music recommenders
-- Where do you think human judgment still matters, even if the model seems "smart"
-
---- The most interesting part is the inclusion of acousticness not for scoring but for consideration & how it influences the recommendation.
-I was able to catch a glimpse of how the music streaming apps work and how user preference is taken into consideration. 
-Human judgment defines the logic, sets its limits, and interprets its output in the real world, which sets a tone different from the model in interpreting the user's taste.
+No API keys. No external services. Runs entirely offline.
